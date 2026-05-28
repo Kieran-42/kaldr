@@ -1,0 +1,16 @@
+/**:
+  ros__parameters:
+    general:
+      grab_resolution: HD720
+      grab_frame_rate: 15
+      pub_resolution: CUSTOM
+      pub_downscale_factor: 2.0
+      grab_compute_capping_fps: 15.0
+      pub_frame_rate: 15.0
+    video:
+      enable_24bit_output: true
+    sensors:
+      sensors_image_sync: true
+    depth:
+      point_cloud_freq: 5.0
+      point_cloud_res: REDUCED
