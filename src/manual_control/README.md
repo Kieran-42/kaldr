@@ -61,3 +61,21 @@ ros2 run manual_control move_forward_odom --ros-args \
 
 The node waits for the first odometry sample, records the starting pose, drives
 forward, and stops when the XY displacement reaches the configured target.
+
+## Turn Using Odometry TF
+
+This node turns the robot in place by watching yaw from `/zed/zed_node/odom`.
+It publishes angular velocity to `/cmd_vel` until the requested yaw change is
+reached.
+
+### Run
+
+```bash
+ros2 run manual_control turn_angle_map_odom --ros-args \
+  -p odom_topic:=/zed/zed_node/odom \
+  -p cmd_vel_topic:=/cmd_vel \
+  -p target_yaw_deg:=90.0 \
+  -p angular_speed_radps:=0.2
+```
+
+Use a negative `target_yaw_deg` to turn clockwise.

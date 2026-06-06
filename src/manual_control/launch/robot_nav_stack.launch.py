@@ -21,6 +21,7 @@ def generate_launch_description():
     launch_rtabmap = LaunchConfiguration('launch_rtabmap')
     launch_nav2 = LaunchConfiguration('launch_nav2')
     launch_bridge = LaunchConfiguration('launch_bridge')
+    launch_odom_tf_bridge = LaunchConfiguration('launch_odom_tf_bridge')
     use_rviz = LaunchConfiguration('use_rviz')
     log_level = LaunchConfiguration('log_level')
     rtabmap_database_path = LaunchConfiguration('rtabmap_database_path')
@@ -38,11 +39,14 @@ def generate_launch_description():
             'camera_name': 'zed',
             'camera_model': camera_model,
             'ros_params_override_path': zed_params_override,
-            'publish_tf': 'true',
+            # This stack publishes odom TF from /zed/zed_node/odom below.
+            'publish_tf': 'false',
             # Let RTAB-Map own map->odom to avoid conflicting map sources.
             'publish_map_tf': 'false',
             'publish_urdf': 'true',
             'publish_imu_tf': 'false',
+            'enable_ipc': 'false',
+            'param_overrides': 'debug.disable_nitros:=true',
             'node_log_type': 'screen',
         }.items(),
     )
@@ -63,6 +67,19 @@ def generate_launch_description():
             '--frame-id', 'zed_camera_link',
             '--child-frame-id', 'base_link',
         ],
+    )
+
+    odom_tf_broadcaster = Node(
+        package='manual_control',
+        executable='odom_tf_broadcaster',
+        name='odom_tf_broadcaster',
+        condition=IfCondition(launch_odom_tf_bridge),
+        output='screen',
+        parameters=[{
+            'odom_topic': '/zed/zed_node/odom',
+            'parent_frame': 'odom',
+            'child_frame': 'zed_camera_link',
+        }],
     )
 
     rtabmap_launch = IncludeLaunchDescription(
@@ -247,6 +264,11 @@ def generate_launch_description():
             description='Launch the serial cmd_vel bridge.',
         ),
         DeclareLaunchArgument(
+            'launch_odom_tf_bridge',
+            default_value='true',
+            description='Publish odom TF from /zed/zed_node/odom messages.',
+        ),
+        DeclareLaunchArgument(
             'use_rviz',
             default_value='false',
             description='Launch RViz from RTAB-Map.',
@@ -268,6 +290,7 @@ def generate_launch_description():
         ),
         zed_launch,
         base_link_static_tf,
+        odom_tf_broadcaster,
         rtabmap_launch,
         controller_server,
         smoother_server,

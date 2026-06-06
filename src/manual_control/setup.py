@@ -31,6 +31,8 @@ setup(
         'console_scripts': [
             'cmd_vel_serial_bridge = manual_control.cmd_vel_serial_bridge:main',
             'move_forward_odom = manual_control.move_forward_odom:main',
+            'odom_tf_broadcaster = manual_control.odom_tf_broadcaster:main',
+            'turn_angle_map_odom = manual_control.turn_angle_map_odom:main',
         ],
     },
 )
